@@ -8,8 +8,7 @@
       "digestAlgorithm": "sha256",
       "timestampUrl": "",
       "webviewInstallMode": {
-        "type": "embedBootstrapper",
-        "silent": true
+        "type": "skip"
       },
       "nsis": {
         "displayLanguageSelector": true,

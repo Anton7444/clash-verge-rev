@@ -24,6 +24,7 @@
 
 **🖥️ Windows**
 
+- Windows：界面改用内置的 Chromium（CEF）渲染，不再依赖系统 Microsoft Edge WebView2
 - Windows 系统代理默认绕过 `*.local` 域名，访问局域网设备的 `.local` 主机名时不再经过代理
 
 </details>

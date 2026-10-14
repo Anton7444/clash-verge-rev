@@ -3,6 +3,8 @@
 use std::process::ExitCode;
 use std::sync::atomic::{AtomicUsize, Ordering};
 
+// CEF relaunches this executable as its renderer, GPU and utility processes.
+#[cfg_attr(windows, tauri_runtime_cef::cef_entry_point)]
 fn main() -> ExitCode {
     let default_parallelism = std::thread::available_parallelism().map(|n| n.get()).unwrap_or(1);
     let worker_limit = std::cmp::min(default_parallelism, 8);

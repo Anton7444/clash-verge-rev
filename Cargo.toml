@@ -71,6 +71,7 @@ tracing = "0.1.44"
 
 tauri = { version = "3.0.0-alpha.4" }
 tauri-runtime-wry = "3.0.0-alpha.4"
+tauri-runtime-cef = "3.0.0-alpha.5"
 tauri-plugin-clipboard-manager = "3.0.0-alpha.2"
 parking_lot = { version = "0.12.5", features = ["hardware-lock-elision"] }
 anyhow = "1.0.104"

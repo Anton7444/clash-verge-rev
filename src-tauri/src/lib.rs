@@ -181,7 +181,12 @@ pub fn run() -> std::process::ExitCode {
     #[cfg(target_os = "linux")]
     utils::linux::workarounds::apply_wayland_webkit_fix();
 
-    let builder = app_init::setup_plugins(tauri::Builder::default().runtime(tauri_runtime_wry::Wry::default()))
+    #[cfg(windows)]
+    let builder = tauri::Builder::default().runtime(tauri_runtime_cef::Cef::default());
+    #[cfg(not(windows))]
+    let builder = tauri::Builder::default().runtime(tauri_runtime_wry::Wry::default());
+
+    let builder = app_init::setup_plugins(builder)
         .setup(|app| {
             // Logger may not be ready yet, so mirror setup panics to stderr.
             fn log_setup_panic(stage: &str, panic: Box<dyn std::any::Any + Send>) {
