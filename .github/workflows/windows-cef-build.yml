@@ -1,0 +1,65 @@
+name: Windows CEF Build
+
+on:
+  push:
+    branches:
+      - claude/wonderful-tesla-drw323
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_INCREMENTAL: 0
+  RUST_BACKTRACE: short
+  HUSKY: 0
+
+concurrency:
+  group: '${{ github.workflow }} - ${{ github.ref }}'
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Install Rust Stable
+        uses: dtolnay/rust-toolchain@1.99.0
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            . -> target
+
+      - uses: pnpm/action-setup@v6
+        name: Install pnpm
+        with:
+          run_install: false
+
+      - name: Install Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24.21.0'
+          cache: 'pnpm'
+
+      - name: Pnpm install and check
+        run: |
+          pnpm i
+          pnpm run prebuild x86_64-pc-windows-msvc
+
+      # Forks lack the upstream updater signing key, so skip updater artifacts.
+      - name: Tauri build
+        env:
+          NODE_OPTIONS: '--max_old_space_size=4096'
+        shell: bash
+        run: pnpm tauri build --target x86_64-pc-windows-msvc -b nsis -c '{"bundle":{"createUpdaterArtifacts":false}}'
+
+      - name: Upload Installer
+        uses: actions/upload-artifact@v7
+        with:
+          name: clash-verge-cef-windows-x64
+          path: target/x86_64-pc-windows-msvc/release/bundle/nsis/*.exe
+          if-no-files-found: error
