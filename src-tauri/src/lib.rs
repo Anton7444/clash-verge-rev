@@ -182,7 +182,23 @@ pub fn run() -> std::process::ExitCode {
     utils::linux::workarounds::apply_wayland_webkit_fix();
 
     #[cfg(windows)]
-    let builder = tauri::Builder::default().runtime(tauri_runtime_cef::Cef::default());
+    let builder = tauri::Builder::default().runtime(
+        tauri_runtime_cef::Cef::default()
+            // Keep the GPU path on even when Chromium's blocklist would fall back to software rendering.
+            .command_line_args([
+                ("ignore-gpu-blocklist", None::<String>),
+                ("enable-gpu-rasterization", None),
+                ("enable-zero-copy", None),
+                // The window lives in the tray; Chromium must not throttle it while hidden or covered.
+                ("disable-background-timer-throttling", None),
+                ("disable-renderer-backgrounding", None),
+                ("disable-backgrounding-occluded-windows", None),
+            ])
+            .disable_features(["CalculateNativeWinOcclusion", "Translate", "MediaRouter"])
+            // The app only loads its own bundled content.
+            .spell_checking(false)
+            .safe_browsing(false),
+    );
     #[cfg(not(windows))]
     let builder = tauri::Builder::default().runtime(tauri_runtime_wry::Wry::default());
 
